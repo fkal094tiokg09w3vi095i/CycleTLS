@@ -5,6 +5,7 @@ import (
 	"flag"
 	http "github.com/Danny-Dasilva/fhttp"
 	"github.com/gorilla/websocket"
+	"io"
 	"io/ioutil"
 	"log"
 	nhttp "net/http"
@@ -35,32 +36,36 @@ type cycleTLSRequest struct {
 	Options   Options `json:"options"`
 }
 
-//rename to request+client+options
+// rename to request+client+options
 type fullRequest struct {
 	req     *http.Request
 	client  http.Client
 	options cycleTLSRequest
 }
 
-//Response contains Cycletls response data
+// Response contains Cycletls response data
 type Response struct {
 	RequestID string
 	Status    int
-	Body      string
+	Body      io.ReadCloser
 	Headers   map[string]string
 }
 
-//JSONBody converts response body to json
+// JSONBody converts response body to json
 func (re Response) JSONBody() map[string]interface{} {
 	var data map[string]interface{}
-	err := json.Unmarshal([]byte(re.Body), &data)
+	body, err := io.ReadAll(re.Body)
 	if err != nil {
-		log.Print("Json Conversion failed " + err.Error() + re.Body)
+		log.Print("ReadAll failed " + err.Error())
+	}
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		log.Print("Json Conversion failed " + err.Error())
 	}
 	return data
 }
 
-//CycleTLS creates full request and response
+// CycleTLS creates full request and response
 type CycleTLS struct {
 	ReqChan  chan fullRequest
 	RespChan chan Response
@@ -174,21 +179,22 @@ func dispatcher(res fullRequest) (response Response, err error) {
 		parsedError := parseError(err)
 
 		headers := make(map[string]string)
-		return Response{res.options.RequestID, parsedError.StatusCode, parsedError.ErrorMsg + "-> \n" + string(err.Error()), headers}, nil //normally return error here
+		// parsedError.ErrorMsg + "-> \n" + string(err.Error())
+		return Response{res.options.RequestID, parsedError.StatusCode, ioutil.NopCloser(strings.NewReader(parsedError.ErrorMsg)), headers}, err
 
 	}
-	defer resp.Body.Close()
+	//defer resp.Body.Close()
 
 	encoding := resp.Header["Content-Encoding"]
 	content := resp.Header["Content-Type"]
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	/*bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Print("Parse Bytes" + err.Error())
 		return response, err
-	}
+	}*/
 
-	Body := DecompressBody(bodyBytes, encoding, content)
+	Body := DecompressBody(resp.Body, encoding, content)
 	headers := make(map[string]string)
 
 	for name, values := range resp.Header {

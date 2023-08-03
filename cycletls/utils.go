@@ -5,8 +5,8 @@ import (
 	"compress/gzip"
 	"compress/zlib"
 	"crypto/sha256"
-	"encoding/base64"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"strconv"
 	"strings"
@@ -33,28 +33,32 @@ func parseUserAgent(userAgent string) string {
 }
 
 // DecompressBody unzips compressed data
-func DecompressBody(Body []byte, encoding []string, content []string) (parsedBody string) {
+func DecompressBody(BodyRead io.ReadCloser, encoding []string, content []string) (parsedBody io.ReadCloser) {
 	if len(encoding) > 0 {
+		Body, err := ioutil.ReadAll(BodyRead)
+		if err != nil {
+			return BodyRead
+		}
 		if encoding[0] == "gzip" {
 			unz, err := gUnzipData(Body)
 			if err != nil {
-				return string(Body)
+				return ioutil.NopCloser(bytes.NewReader(Body))
 			}
-			return string(unz)
+			return ioutil.NopCloser(bytes.NewReader(unz))
 		} else if encoding[0] == "deflate" {
 			unz, err := enflateData(Body)
 			if err != nil {
-				return string(Body)
+				return ioutil.NopCloser(bytes.NewReader(Body))
 			}
-			return string(unz)
+			return ioutil.NopCloser(bytes.NewReader(unz))
 		} else if encoding[0] == "br" {
 			unz, err := unBrotliData(Body)
 			if err != nil {
-				return string(Body)
+				return ioutil.NopCloser(bytes.NewReader(Body))
 			}
-			return string(unz)
+			return ioutil.NopCloser(bytes.NewReader(unz))
 		}
-	} else if len(content) > 0 {
+	} /*else if len(content) > 0 {
 		decodingTypes := map[string]bool{
 			"image/svg+xml":   true,
 			"image/webp":      true,
@@ -63,12 +67,10 @@ func DecompressBody(Body []byte, encoding []string, content []string) (parsedBod
 			"application/pdf": true,
 		}
 		if decodingTypes[content[0]] {
-			return base64.StdEncoding.EncodeToString(Body)
+			return ioutil.NopCloser(base64.StdEncoding.NewReader(bytes.NewReader(Body)))
 		}
-	}
-	parsedBody = string(Body)
-	return parsedBody
-
+	}*/
+	return BodyRead
 }
 
 func gUnzipData(data []byte) (resData []byte, err error) {
