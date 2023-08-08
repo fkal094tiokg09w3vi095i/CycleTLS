@@ -1,6 +1,6 @@
 module github.com/ChengHoward/CycleTLS/cycletls
 
-go 1.14
+go 1.17
 
 require (
 	github.com/Danny-Dasilva/fhttp v0.0.0-20220524230104-f801520157d6
