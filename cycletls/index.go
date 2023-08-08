@@ -23,6 +23,7 @@ type Options struct {
 	Body            io.ReadCloser     `json:"body"`
 	Ja3             string            `json:"ja3"`
 	UserAgent       string            `json:"userAgent"`
+	Stream          bool              `json:"stream"`
 	Proxy           string            `json:"proxy"`
 	Cookies         []Cookie          `json:"cookies"`
 	Timeout         int               `json:"timeout"`
@@ -183,18 +184,23 @@ func dispatcher(res fullRequest) (response Response, err error) {
 		return Response{res.options.RequestID, parsedError.StatusCode, ioutil.NopCloser(strings.NewReader(parsedError.ErrorMsg)), headers}, err
 
 	}
-	//defer resp.Body.Close()
 
-	encoding := resp.Header["Content-Encoding"]
-	content := resp.Header["Content-Type"]
+	encoding := strings.Join(resp.Header["Content-Encoding"], ",")
+	//content := resp.Header["Content-Type"]
 
 	/*bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Print("Parse Bytes" + err.Error())
 		return response, err
 	}*/
+	var Body io.ReadCloser
+	if res.options.Options.Stream {
+		Body = resp.Body
+	} else {
+		defer resp.Body.Close()
+		Body = DecompressBody(resp.Body, encoding)
+	}
 
-	Body := DecompressBody(resp.Body, encoding, content)
 	headers := make(map[string]string)
 
 	for name, values := range resp.Header {

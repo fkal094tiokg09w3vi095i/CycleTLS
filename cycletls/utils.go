@@ -33,44 +33,32 @@ func parseUserAgent(userAgent string) string {
 }
 
 // DecompressBody unzips compressed data
-func DecompressBody(BodyRead io.ReadCloser, encoding []string, content []string) (parsedBody io.ReadCloser) {
-	if len(encoding) > 0 {
-		Body, err := ioutil.ReadAll(BodyRead)
+func DecompressBody(Body io.ReadCloser, encoding string) (parsedBody io.ReadCloser) {
+	BodyBuffer, err := io.ReadAll(Body)
+	if err != nil {
+		return Body
+	}
+
+	if encoding == "gzip" {
+		unz, err := gUnzipData(BodyBuffer)
 		if err != nil {
-			return BodyRead
+			return io.NopCloser(bytes.NewReader(BodyBuffer))
 		}
-		if encoding[0] == "gzip" {
-			unz, err := gUnzipData(Body)
-			if err != nil {
-				return ioutil.NopCloser(bytes.NewReader(Body))
-			}
-			return ioutil.NopCloser(bytes.NewReader(unz))
-		} else if encoding[0] == "deflate" {
-			unz, err := enflateData(Body)
-			if err != nil {
-				return ioutil.NopCloser(bytes.NewReader(Body))
-			}
-			return ioutil.NopCloser(bytes.NewReader(unz))
-		} else if encoding[0] == "br" {
-			unz, err := unBrotliData(Body)
-			if err != nil {
-				return ioutil.NopCloser(bytes.NewReader(Body))
-			}
-			return ioutil.NopCloser(bytes.NewReader(unz))
+		return io.NopCloser(bytes.NewReader(unz))
+	} else if encoding == "deflate" {
+		unz, err := enflateData(BodyBuffer)
+		if err != nil {
+			return io.NopCloser(bytes.NewReader(BodyBuffer))
 		}
-	} /*else if len(content) > 0 {
-		decodingTypes := map[string]bool{
-			"image/svg+xml":   true,
-			"image/webp":      true,
-			"image/jpeg":      true,
-			"image/png":       true,
-			"application/pdf": true,
+		return io.NopCloser(bytes.NewReader(unz))
+	} else if encoding == "br" {
+		unz, err := unBrotliData(BodyBuffer)
+		if err != nil {
+			return io.NopCloser(bytes.NewReader(BodyBuffer))
 		}
-		if decodingTypes[content[0]] {
-			return ioutil.NopCloser(base64.StdEncoding.NewReader(bytes.NewReader(Body)))
-		}
-	}*/
-	return BodyRead
+		return io.NopCloser(bytes.NewReader(unz))
+	}
+	return io.NopCloser(bytes.NewReader(BodyBuffer))
 }
 
 func gUnzipData(data []byte) (resData []byte, err error) {
