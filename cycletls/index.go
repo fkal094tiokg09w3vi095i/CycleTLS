@@ -20,7 +20,7 @@ type Options struct {
 	URL             string            `json:"url"`
 	Method          string            `json:"method"`
 	Headers         map[string]string `json:"headers"`
-	Body            string            `json:"body"`
+	Body            io.ReadCloser     `json:"body"`
 	Ja3             string            `json:"ja3"`
 	UserAgent       string            `json:"userAgent"`
 	Proxy           string            `json:"proxy"`
@@ -91,7 +91,7 @@ func processRequest(request cycleTLSRequest) (result fullRequest) {
 		log.Fatal(err)
 	}
 
-	req, err := http.NewRequest(strings.ToUpper(request.Options.Method), request.Options.URL, strings.NewReader(request.Options.Body))
+	req, err := http.NewRequest(strings.ToUpper(request.Options.Method), request.Options.URL, request.Options.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -241,7 +241,7 @@ func (client CycleTLS) Do(URL string, options Options, Method string) (response 
 //TODO rename this
 
 // Init starts the worker pool or returns a empty cycletls struct
-func Init(workers ...bool) CycleTLS {
+func InitInit(workers ...bool) CycleTLS {
 	if len(workers) > 0 && workers[0] {
 		reqChan := make(chan fullRequest)
 		respChan := make(chan Response)
