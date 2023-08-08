@@ -12,9 +12,9 @@ Currently a WIP and in Active development. See the ![Projects](https://github.co
 	
 
 ![build](https://github.com/Danny-Dasilva/CycleTLS/actions/workflows/test_golang.yml/badge.svg)
-[![GoDoc](http://img.shields.io/badge/go-documentation-blue.svg)](http://godoc.org/github.com/Danny-Dasilva/CycleTLS/cycletls) 
+[![GoDoc](http://img.shields.io/badge/go-documentation-blue.svg)](http://godoc.org/github.com/ChengHoward/CycleTLS/cycletls) 
 [![license](https://img.shields.io/github/license/Danny-Dasilva/CycleTLS.svg)](https://github.com/Danny-Dasilva/CycleTLS/blob/main/LICENSE)
-[![Go Report Card](https://goreportcard.com/badge/github.com/Danny-Dasilva/CycleTLS/cycletls)](https://goreportcard.com/report/github.com/Danny-Dasilva/CycleTLS/cycletls)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ChengHoward/CycleTLS/cycletls)](https://goreportcard.com/report/github.com/ChengHoward/CycleTLS/cycletls)
 [![npm version](https://img.shields.io/npm/v/cycletls.svg)](https://www.npmjs.org/package/cycletls)
 </div>
 
@@ -66,7 +66,7 @@ $ npm install cycletls
 Golang
 
 ```bash
-$ go get github.com/Danny-Dasilva/CycleTLS/cycletls 
+$ go get github.com/ChengHoward/CycleTLS/cycletls 
 ```
 
 # Usage 
@@ -108,7 +108,7 @@ package main
 
 import (
 	"log"
-	"github.com/Danny-Dasilva/CycleTLS/cycletls"
+	"github.com/ChengHoward/CycleTLS/cycletls"
 )
 
 func main() {
@@ -149,7 +149,7 @@ initCycleTLS().then((cycleTLS) => {});
 
 ```go
 import (
-	"github.com/Danny-Dasilva/CycleTLS/cycletls"
+	"github.com/ChengHoward/CycleTLS/cycletls"
 )
 
 //The `Init` function initializes golang channels to process requests. 
@@ -323,7 +323,7 @@ Set module-aware mode
 
 Install golang dependencies
 
-`go get github.com/Danny-Dasilva/CycleTLS/cycletls`
+`go get github.com/ChengHoward/CycleTLS/cycletls`
 
 install npm packages
 
@@ -446,7 +446,7 @@ const initCycleTLS = require("cycletls");
 package main
 
 import (
-    "github.com/Danny-Dasilva/CycleTLS/cycletls"
+    "github.com/ChengHoward/CycleTLS/cycletls"
 )
 
 func main() {
@@ -606,7 +606,7 @@ package main
 import (
     "encoding/base64"
     "os"
-    "github.com/Danny-Dasilva/CycleTLS/cycletls"
+    "github.com/ChengHoward/CycleTLS/cycletls"
 )
 
 func main() {

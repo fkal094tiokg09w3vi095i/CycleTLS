@@ -9,7 +9,7 @@ import (
 	"os"
 	"testing"
 
-	cycletls "github.com/Danny-Dasilva/CycleTLS/cycletls"
+	cycletls "github.com/ChengHoward/CycleTLS/cycletls"
 )
 
 func SimpleFileWriteTest(t *testing.T) {
