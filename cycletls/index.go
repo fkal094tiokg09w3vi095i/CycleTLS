@@ -167,7 +167,9 @@ func processRequest(request cycleTLSRequest) (result fullRequest) {
 			req.Header.Set(k, v)
 		}
 	}
-	req.Header.Set("Host", u.Host)
+	if req.Header.Get("Host") == "" {
+		req.Header.Set("Host", u.Host)
+	}
 	req.Header.Set("user-agent", request.Options.UserAgent)
 	return fullRequest{req: req, client: client, options: request}
 
