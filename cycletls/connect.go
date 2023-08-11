@@ -90,16 +90,18 @@ func newConnectDialer(proxyURLStr string, UserAgent string) (proxy.ContextDialer
 		return nil, errors.New("scheme " + proxyURL.Scheme + " is not supported")
 	}
 
+	client.Dialer = &net.Dialer{}
+
 	if proxyURL.User != nil {
 		if proxyURL.User.Username() != "" {
 			// password, _ := proxyUrl.User.Password()
-			// client.DefaultHeader.Set("Proxy-Authorization", "Basic "+
+			// transport.DefaultHeader.Set("Proxy-Authorization", "Basic "+
 			// 	base64.StdEncoding.EncodeToString([]byte(proxyUrl.User.Username()+":"+password)))
 
 			username := proxyURL.User.Username()
 			password, _ := proxyURL.User.Password()
 
-			// client.DefaultHeader.SetBasicAuth(username, password)
+			// transport.DefaultHeader.SetBasicAuth(username, password)
 			auth := username + ":" + password
 			basicAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
 			client.DefaultHeader.Add("Proxy-Authorization", basicAuth)
