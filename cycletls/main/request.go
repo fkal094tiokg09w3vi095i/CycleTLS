@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	fileURL := "https://194.9.149.45/zh/online-business/schedule/interactive-schedule/interactive-schedule-solution.html?sn=TIANJIN%20XINGANG&sl=CNTXG&sp=&en=ENSENADA,%20BCN&el=MXESE&ep=22800&exportHaulage=MH&importHaulage=MH&departureDate=2023-08-04&weeksAfterStart=4&reefer=N&exportMot=VE&importMot=VE"
+	fileURL := "https://ipinfo.io/"
 	client := cycletls.Init()
 
 	resp, err := client.Do(fileURL, cycletls.Options{
@@ -17,7 +17,7 @@ func main() {
 		//Stream:          true,
 		Timeout:         120,
 		DisableRedirect: true,
-		Proxy:           "socks5://127.0.0.1:1087",
+		Proxy:           "socks5://abc:123@127.0.0.1:1087",
 		Headers: map[string]string{
 			"Host": "www.hapag-lloyd.com",
 			//"Connection":                "Upgrade, HTTP2-Settings",
@@ -28,14 +28,15 @@ func main() {
 			"Sec-Ch-Ua-Platform":        "\"Windows\"",
 			"Upgrade-Insecure-Requests": "1",
 			"User-Agent":                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36",
-			"Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-			"Sec-Fetch-Site":            "none",
-			"Sec-Fetch-Mode":            "navigate",
-			"Sec-Fetch-User":            "?1",
-			"Sec-Fetch-Dest":            "document",
-			"Accept-Encoding":           "gzip, deflate, br",
-			"Accept-Language":           "en-US,en;q=0.9",
-			"Pragma":                    "no-cache",
+			//"Accept":                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+			"Accept":          "application/json, text/plain, */*",
+			"Sec-Fetch-Site":  "none",
+			"Sec-Fetch-Mode":  "navigate",
+			"Sec-Fetch-User":  "?1",
+			"Sec-Fetch-Dest":  "document",
+			"Accept-Encoding": "gzip, deflate, br",
+			"Accept-Language": "en-US,en;q=0.9",
+			"Pragma":          "no-cache",
 		},
 	}, "GET")
 	defer func(Body io.ReadCloser) {
