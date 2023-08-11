@@ -17,7 +17,7 @@ func main() {
 		//Stream:          true,
 		Timeout:         120,
 		DisableRedirect: true,
-		Proxy:           "socks5://127.0.0.1:10808",
+		Proxy:           "socks5://127.0.0.1:1087",
 		Headers: map[string]string{
 			"Host": "www.hapag-lloyd.com",
 			//"Connection":                "Upgrade, HTTP2-Settings",
