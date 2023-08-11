@@ -11,13 +11,13 @@ func main() {
 	client := cycletls.Init()
 
 	resp, err := client.Do(fileURL, cycletls.Options{
-		Body:            nil,
-		Ja3:             "771,4865-4866-4867-49195-49199-49196-49200-52393-52392-49171-49172-156-157-47-53,0-5-10-11-13-16-18-21-23-27-35-43-45-51-17513-65281,29-23-24,0",
-		UserAgent:       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-		Stream:          true,
+		Body:      nil,
+		Ja3:       "771,4865-4866-4867-49195-49199-49196-49200-52393-52392-49171-49172-156-157-47-53,0-5-10-11-13-16-18-21-23-27-35-43-45-51-17513-65281,29-23-24,0",
+		UserAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+		//Stream:          true,
 		Timeout:         120,
 		DisableRedirect: true,
-		//Proxy:     "http://127.0.0.1:10809",
+		Proxy:           "socks5://127.0.0.1:10808",
 		Headers: map[string]string{
 			"Host": "www.hapag-lloyd.com",
 			//"Connection":                "Upgrade, HTTP2-Settings",
@@ -49,11 +49,11 @@ func main() {
 		fmt.Println("Error:", err)
 		return
 	}
-	_, err = io.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
 	fmt.Println(resp.Status)
-	//fmt.Println(string(body))
+	fmt.Println(string(body))
 }
