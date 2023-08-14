@@ -1,7 +1,8 @@
 package cycletls
 
 import (
-	http "github.com/Danny-Dasilva/fhttp"
+	http "github.com/ChengHoward/fhttp"
+	"github.com/ChengHoward/fhttp/http2"
 
 	"time"
 
@@ -10,9 +11,10 @@ import (
 
 type browser struct {
 	// Return a greeting that embeds the name in a message.
-	JA3       string
-	UserAgent string
-	Cookies   []Cookie
+	JA3           string
+	UserAgent     string
+	Cookies       []Cookie
+	HTTP2Settings *http2.HTTP2Settings
 }
 
 var disabledRedirect = func(req *http.Request, via []*http.Request) error {
@@ -25,8 +27,10 @@ func clientBuilder(browser browser, dialer proxy.ContextDialer, timeout int, dis
 		timeout = 15
 	}
 	client := http.Client{
-		Transport: newRoundTripper(browser, dialer),
-		Timeout:   time.Duration(timeout) * time.Second,
+		Timeout: time.Duration(timeout) * time.Second,
+	}
+	if browser.JA3 != "" {
+		client.Transport = newRoundTripper(browser, dialer)
 	}
 	//if disableRedirect is set to true httpclient will not redirect
 	if disableRedirect {

@@ -3,7 +3,8 @@ package cycletls
 import (
 	"encoding/json"
 	"flag"
-	http "github.com/Danny-Dasilva/fhttp"
+	http "github.com/ChengHoward/fhttp"
+	"github.com/ChengHoward/fhttp/http2"
 	"github.com/gorilla/websocket"
 	"io"
 	"io/ioutil"
@@ -17,19 +18,20 @@ import (
 
 // Options sets CycleTLS client options
 type Options struct {
-	URL             string            `json:"url"`
-	Method          string            `json:"method"`
-	Headers         map[string]string `json:"headers"`
-	Body            io.ReadCloser     `json:"body"`
-	Ja3             string            `json:"ja3"`
-	UserAgent       string            `json:"userAgent"`
-	Stream          bool              `json:"stream"`
-	Proxy           string            `json:"proxy"`
-	Cookies         []Cookie          `json:"cookies"`
-	Timeout         int               `json:"timeout"`
-	DisableRedirect bool              `json:"disableRedirect"`
-	HeaderOrder     []string          `json:"headerOrder"`
-	OrderAsProvided bool              `json:"orderAsProvided"` //TODO
+	URL             string               `json:"url"`
+	Method          string               `json:"method"`
+	Headers         map[string]string    `json:"headers"`
+	Body            io.ReadCloser        `json:"body"`
+	Ja3             string               `json:"ja3"`
+	UserAgent       string               `json:"userAgent"`
+	Stream          bool                 `json:"stream"`
+	Proxy           string               `json:"proxy"`
+	Cookies         []Cookie             `json:"cookies"`
+	Timeout         int                  `json:"timeout"`
+	DisableRedirect bool                 `json:"disableRedirect"`
+	HeaderOrder     []string             `json:"headerOrder"`
+	OrderAsProvided bool                 `json:"orderAsProvided"` //TODO
+	HTTP2Settings   *http2.HTTP2Settings `json:"-"`
 }
 
 type cycleTLSRequest struct {
@@ -74,11 +76,15 @@ type CycleTLS struct {
 
 // ready Request
 func processRequest(request cycleTLSRequest) (result fullRequest) {
-
 	var browser = browser{
-		JA3:       request.Options.Ja3,
-		UserAgent: request.Options.UserAgent,
-		Cookies:   request.Options.Cookies,
+		JA3:           request.Options.Ja3,
+		UserAgent:     request.Options.UserAgent,
+		Cookies:       request.Options.Cookies,
+		HTTP2Settings: request.Options.HTTP2Settings,
+	}
+
+	if request.Options.Ja3 != "" && !strings.HasPrefix(request.Options.URL, "https") {
+		browser.JA3 = ""
 	}
 
 	client, err := newClient(
@@ -88,6 +94,7 @@ func processRequest(request cycleTLSRequest) (result fullRequest) {
 		request.Options.UserAgent,
 		request.Options.Proxy,
 	)
+
 	if err != nil {
 		log.Fatal(err)
 	}

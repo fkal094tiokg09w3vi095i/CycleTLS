@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	utls "github.com/Danny-Dasilva/utls"
+	utls "github.com/ChengHoward/utls"
 	"github.com/andybalholm/brotli"
 )
 

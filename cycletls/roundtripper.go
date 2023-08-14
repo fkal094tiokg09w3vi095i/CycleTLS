@@ -9,9 +9,9 @@ import (
 	"strings"
 	"sync"
 
-	http "github.com/Danny-Dasilva/fhttp"
-	http2 "github.com/Danny-Dasilva/fhttp/http2"
-	utls "github.com/Danny-Dasilva/utls"
+	http "github.com/ChengHoward/fhttp"
+	http2 "github.com/ChengHoward/fhttp/http2"
+	utls "github.com/ChengHoward/utls"
 	"golang.org/x/net/proxy"
 )
 
@@ -26,6 +26,7 @@ type roundTripper struct {
 	Cookies           []Cookie
 	cachedConnections map[string]net.Conn
 	cachedTransports  map[string]http.RoundTripper
+	http2Settings     *http2.HTTP2Settings
 
 	dialer proxy.ContextDialer
 }
@@ -34,7 +35,7 @@ func (rt *roundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	// Fix this later for proper cookie parsing
 	for _, properties := range rt.Cookies {
 		req.AddCookie(&http.Cookie{
-			Name: properties.Name,
+			Name:       properties.Name,
 			Value:      properties.Value,
 			Path:       properties.Path,
 			Domain:     properties.Domain,
@@ -135,9 +136,11 @@ func (rt *roundTripper) dialTLS(ctx context.Context, network, addr string) (net.
 	switch conn.ConnectionState().NegotiatedProtocol {
 	case http2.NextProtoTLS:
 		parsedUserAgent := parseUserAgent(rt.UserAgent)
-		t2 := http2.Transport{DialTLS: rt.dialTLSHTTP2,
-			PushHandler: &http2.DefaultPushHandler{},
-			Navigator:   parsedUserAgent,
+		t2 := http2.Transport{
+			DialTLS:       rt.dialTLSHTTP2,
+			PushHandler:   &http2.DefaultPushHandler{},
+			Navigator:     parsedUserAgent,
+			HTTP2Settings: rt.http2Settings,
 		}
 		rt.cachedTransports[addr] = &t2
 	default:
@@ -167,7 +170,6 @@ func (rt *roundTripper) getDialTLSAddr(req *http.Request) string {
 
 func newRoundTripper(browser browser, dialer ...proxy.ContextDialer) http.RoundTripper {
 	if len(dialer) > 0 {
-
 		return &roundTripper{
 			dialer: dialer[0],
 
@@ -176,6 +178,7 @@ func newRoundTripper(browser browser, dialer ...proxy.ContextDialer) http.RoundT
 			Cookies:           browser.Cookies,
 			cachedTransports:  make(map[string]http.RoundTripper),
 			cachedConnections: make(map[string]net.Conn),
+			http2Settings:     browser.HTTP2Settings,
 		}
 	}
 
@@ -187,5 +190,6 @@ func newRoundTripper(browser browser, dialer ...proxy.ContextDialer) http.RoundT
 		Cookies:           browser.Cookies,
 		cachedTransports:  make(map[string]http.RoundTripper),
 		cachedConnections: make(map[string]net.Conn),
+		http2Settings:     browser.HTTP2Settings,
 	}
 }
