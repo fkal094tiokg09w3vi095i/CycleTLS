@@ -11,7 +11,7 @@ import (
 
 	http "github.com/ChengHoward/fhttp"
 	http2 "github.com/ChengHoward/fhttp/http2"
-	utls "github.com/ChengHoward/utls"
+	utls "github.com/refraction-networking/utls"
 	"golang.org/x/net/proxy"
 )
 

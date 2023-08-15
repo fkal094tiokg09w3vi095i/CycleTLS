@@ -18,20 +18,22 @@ import (
 
 // Options sets CycleTLS client options
 type Options struct {
-	URL             string               `json:"url"`
-	Method          string               `json:"method"`
-	Headers         map[string]string    `json:"headers"`
-	Body            io.ReadCloser        `json:"body"`
-	Ja3             string               `json:"ja3"`
-	UserAgent       string               `json:"userAgent"`
-	Stream          bool                 `json:"stream"`
-	Proxy           string               `json:"proxy"`
-	Cookies         []Cookie             `json:"cookies"`
-	Timeout         int                  `json:"timeout"`
-	DisableRedirect bool                 `json:"disableRedirect"`
-	HeaderOrder     []string             `json:"headerOrder"`
-	OrderAsProvided bool                 `json:"orderAsProvided"` //TODO
-	HTTP2Settings   *http2.HTTP2Settings `json:"-"`
+	URL              string               `json:"url"`
+	Method           string               `json:"method"`
+	Headers          map[string]string    `json:"headers"`
+	Body             io.ReadCloser        `json:"body"`
+	Ja3              string               `json:"ja3"`
+	TLSExtensions    *TLSExtensions       `json:"-"`
+	HTTP2Settings    *http2.HTTP2Settings `json:"-"`
+	PHeaderOrderKeys []string             `json:"-"`
+	HeaderOrderKeys  []string             `json:"-"`
+	UserAgent        string               `json:"userAgent"`
+	Stream           bool                 `json:"stream"`
+	Proxy            string               `json:"proxy"`
+	Cookies          []Cookie             `json:"cookies"`
+	Timeout          int                  `json:"timeout"`
+	DisableRedirect  bool                 `json:"disableRedirect"`
+	HeaderOrder      []string             `json:"headerOrder"`
 }
 
 type cycleTLSRequest struct {
@@ -103,64 +105,43 @@ func processRequest(request cycleTLSRequest) (result fullRequest) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	headerorder := []string{}
-	//master header order, all your headers will be ordered based on this list and anything extra will be appended to the end
-	//if your site has any custom headers, see the header order chrome uses and then add those headers to this list
-	if len(request.Options.HeaderOrder) > 0 {
-		//lowercase headers
-		for _, v := range request.Options.HeaderOrder {
-			lowercasekey := strings.ToLower(v)
-			headerorder = append(headerorder, lowercasekey)
-		}
-	} else {
-		headerorder = append(headerorder,
-			"host",
-			"connection",
-			"cache-control",
-			"device-memory",
-			"viewport-width",
-			"rtt",
-			"downlink",
-			"ect",
-			"sec-ch-ua",
-			"sec-ch-ua-mobile",
-			"sec-ch-ua-full-version",
-			"sec-ch-ua-arch",
-			"sec-ch-ua-platform",
-			"sec-ch-ua-platform-version",
-			"sec-ch-ua-model",
-			"upgrade-insecure-requests",
-			"user-agent",
-			"accept",
-			"sec-fetch-site",
-			"sec-fetch-mode",
-			"sec-fetch-user",
-			"sec-fetch-dest",
-			"referer",
-			"accept-encoding",
-			"accept-language",
-			"cookie",
-		)
-	}
-
-	headermap := make(map[string]string)
-	//TODO: Shorten this
-	headerorderkey := []string{}
-	for _, key := range headerorder {
-		for k, v := range request.Options.Headers {
-			lowercasekey := strings.ToLower(k)
-			if key == lowercasekey {
-				headermap[k] = v
-				headerorderkey = append(headerorderkey, lowercasekey)
-			}
-		}
-
-	}
+	/*
+		"host",
+		"connection",
+		"cache-control",
+		"device-memory",
+		"viewport-width",
+		"rtt",
+		"downlink",
+		"ect",
+		"sec-ch-ua",
+		"sec-ch-ua-mobile",
+		"sec-ch-ua-full-version",
+		"sec-ch-ua-arch",
+		"sec-ch-ua-platform",
+		"sec-ch-ua-platform-version",
+		"sec-ch-ua-model",
+		"upgrade-insecure-requests",
+		"user-agent",
+		"accept",
+		"sec-fetch-site",
+		"sec-fetch-mode",
+		"sec-fetch-user",
+		"sec-fetch-dest",
+		"referer",
+		"accept-encoding",
+		"accept-language",
+		"cookie",
+	*/
 
 	//ordering the pseudo headers and our normal headers
+	if request.Options.PHeaderOrderKeys == nil {
+		request.Options.PHeaderOrderKeys = []string{":method", ":authority", ":scheme", ":path"}
+	}
+
 	req.Header = http.Header{
-		http.HeaderOrderKey:  headerorderkey,
-		http.PHeaderOrderKey: {":method", ":authority", ":scheme", ":path"},
+		http.HeaderOrderKey:  request.Options.HeaderOrderKeys,
+		http.PHeaderOrderKey: request.Options.PHeaderOrderKeys,
 	}
 	//set our Host header
 	u, err := url.Parse(request.Options.URL)
