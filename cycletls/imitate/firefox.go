@@ -20,19 +20,11 @@ var firefoxH2Settings = &cycletls.H2Settings{
 	},
 	ConnectionFlow: 12517377,
 	HeaderPriority: map[string]interface{}{
-		"weight":    256,
-		"streamDep": 0,
-		"exclusive": true,
+		"weight":    42,
+		"streamDep": 13,
+		"exclusive": false,
 	},
 	PriorityFrames: []map[string]interface{}{
-		/*{
-			"streamID": 0,
-			"priorityParam": map[string]interface{}{
-				"weight":    0,
-				"streamDep": 0,
-				"exclusive": true,
-			},
-		},*/
 		{
 			"streamID": 3,
 			"priorityParam": map[string]interface{}{
@@ -96,4 +88,13 @@ func Firefox(options *cycletls.Options) {
 		":authority",
 		":scheme",
 	}
+
+	options.Headers["Sec-Ch-Ua"] = `"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"`
+	options.Headers["Sec-Fetch-Dest"] = "document"
+	options.Headers["Sec-Fetch-Mode"] = "navigate"
+	options.Headers["Sec-Fetch-Site"] = "none"
+	options.Headers["Sec-Fetch-User"] = "?1"
+	options.Headers["te"] = "trailers"
+	options.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
+
 }

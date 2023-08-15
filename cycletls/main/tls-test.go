@@ -24,8 +24,8 @@ func main() {
 		},
 	}
 
-	imitate.Chrome(&options)
-	//imitate.Firefox(&options)
+	//imitate.Chrome(&options)
+	imitate.Firefox(&options)
 
 	resp, err := client.Do("https://tls.peet.ws/api/all", options, "GET")
 	//resp, err := client.Do("https://tls.browserleaks.com/json", options, "GET")
