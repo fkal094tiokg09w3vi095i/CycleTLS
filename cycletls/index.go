@@ -77,7 +77,7 @@ type CycleTLS struct {
 }
 
 // ready Request
-func processRequest(request *cycleTLSRequest) (result fullRequest) {
+func processRequest(request *cycleTLSRequest) (result *fullRequest) {
 	var browser = browser{
 		JA3:           request.Options.Ja3,
 		UserAgent:     request.Options.UserAgent,
@@ -159,7 +159,7 @@ func processRequest(request *cycleTLSRequest) (result fullRequest) {
 		req.Header.Set("Host", u.Host)
 	}
 	req.Header.Set("user-agent", request.Options.UserAgent)
-	return fullRequest{req: req, client: client, options: *request}
+	return &fullRequest{req: req, client: client, options: *request}
 
 }
 
@@ -213,8 +213,7 @@ func (client CycleTLS) Queue(URL string, options Options, Method string) {
 	options.Method = Method
 	//TODO add timestamp to request
 	opt := cycleTLSRequest{"Queued Request", options}
-	response := processRequest(&opt)
-	client.ReqChan <- response
+	client.ReqChan <- *processRequest(&opt)
 }
 
 // Do creates a single request
@@ -224,8 +223,7 @@ func (client CycleTLS) Do(URL string, options *Options, Method string) (response
 	options.Method = Method
 	opt := cycleTLSRequest{"cycleTLSRequest", *options}
 
-	res := processRequest(&opt)
-	response, err = dispatcher(&res)
+	response, err = dispatcher(processRequest(&opt))
 	if err != nil {
 		log.Print("Request Failed: " + err.Error())
 		return response, err
@@ -294,9 +292,7 @@ func readSocket(reqChan chan fullRequest, c *websocket.Conn) {
 			return
 		}
 
-		reply := processRequest(request)
-
-		reqChan <- reply
+		reqChan <- *processRequest(request)
 	}
 }
 
