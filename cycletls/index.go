@@ -197,9 +197,7 @@ func dispatcher(res *fullRequest) (response Response, err error) {
 		if name == "Set-Cookie" {
 			headers[name] = strings.Join(values, "/,/")
 		} else {
-			for _, value := range values {
-				headers[name] = value
-			}
+			headers[name] = values[0]
 		}
 	}
 	return Response{res.options.RequestID, resp.StatusCode, Body, headers}, nil
