@@ -218,11 +218,11 @@ func (client CycleTLS) Queue(URL string, options Options, Method string) {
 }
 
 // Do creates a single request
-func (client CycleTLS) Do(URL string, options Options, Method string) (response Response, err error) {
+func (client CycleTLS) Do(URL string, options *Options, Method string) (response Response, err error) {
 
 	options.URL = URL
 	options.Method = Method
-	opt := cycleTLSRequest{"cycleTLSRequest", options}
+	opt := cycleTLSRequest{"cycleTLSRequest", *options}
 
 	res := processRequest(&opt)
 	response, err = dispatcher(&res)
