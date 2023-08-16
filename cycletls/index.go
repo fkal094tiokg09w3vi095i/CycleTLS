@@ -163,7 +163,7 @@ func processRequest(request *cycleTLSRequest) (result fullRequest) {
 
 }
 
-func dispatcher(res fullRequest) (response Response, err error) {
+func dispatcher(res *fullRequest) (response Response, err error) {
 	resp, err := res.client.Do(res.req)
 	if err != nil {
 
@@ -225,7 +225,7 @@ func (client CycleTLS) Do(URL string, options Options, Method string) (response 
 	opt := cycleTLSRequest{"cycleTLSRequest", options}
 
 	res := processRequest(&opt)
-	response, err = dispatcher(res)
+	response, err = dispatcher(&res)
 	if err != nil {
 		log.Print("Request Failed: " + err.Error())
 		return response, err
@@ -268,7 +268,7 @@ func workerPool(reqChan chan fullRequest, respChan chan Response) {
 // Worker
 func worker(reqChan chan fullRequest, respChan chan Response) {
 	for res := range reqChan {
-		response, err := dispatcher(res)
+		response, err := dispatcher(&res)
 		if err != nil {
 			log.Print("Request Failed: " + err.Error())
 		}
