@@ -21,7 +21,7 @@ type Options struct {
 	URL              string               `json:"url"`
 	Method           string               `json:"method"`
 	Headers          map[string]string    `json:"headers"`
-	Body             io.ReadCloser        `json:"body"`
+	Body             string               `json:"body"`
 	Ja3              string               `json:"ja3"`
 	TLSExtensions    *TLSExtensions       `json:"-"`
 	HTTP2Settings    *http2.HTTP2Settings `json:"-"`
@@ -101,7 +101,7 @@ func processRequest(request *cycleTLSRequest) (result *fullRequest) {
 		log.Fatal(err)
 	}
 
-	req, err := http.NewRequest(strings.ToUpper(request.Options.Method), request.Options.URL, request.Options.Body)
+	req, err := http.NewRequest(strings.ToUpper(request.Options.Method), request.Options.URL, strings.NewReader(request.Options.Body))
 	if err != nil {
 		log.Fatal(err)
 	}
