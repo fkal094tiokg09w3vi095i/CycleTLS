@@ -1,6 +1,7 @@
 package cycletls
 
 import (
+	"bytes"
 	"encoding/json"
 	http "github.com/ChengHoward/fhttp"
 	"github.com/ChengHoward/fhttp/http2"
@@ -27,9 +28,6 @@ type Options struct {
 	Timeout          int                  `json:"timeout"`
 	DisableRedirect  bool                 `json:"disableRedirect"`
 	HeaderOrder      []string             `json:"headerOrder"`
-}
-
-type cycleTLSRequest struct {
 }
 
 // rename to request+client+options
@@ -159,7 +157,7 @@ func dispatcher(res *fullRequest) (response Response, err error) {
 
 		headers := make(map[string]string)
 		// parsedError.ErrorMsg + "-> \n" + string(err.Error())
-		return Response{parsedError.StatusCode, io.NopCloser(strings.NewReader(parsedError.ErrorMsg)), headers}, err
+		return Response{parsedError.StatusCode, io.NopCloser(bytes.NewBufferString(parsedError.ErrorMsg)), headers}, err
 
 	}
 
