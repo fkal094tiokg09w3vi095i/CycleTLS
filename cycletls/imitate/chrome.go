@@ -50,6 +50,35 @@ func Chrome(options *cycletls.Options) {
 		":scheme",
 		":path",
 	}
+	options.HeaderOrderKeys = []string{
+		"host",
+		"connection",
+		"cache-control",
+		"device-memory",
+		"viewport-width",
+		"rtt",
+		"downlink",
+		"ect",
+		"sec-ch-ua",
+		"sec-ch-ua-mobile",
+		"sec-ch-ua-full-version",
+		"sec-ch-ua-arch",
+		"sec-ch-ua-platform",
+		"sec-ch-ua-platform-version",
+		"sec-ch-ua-model",
+		"upgrade-insecure-requests",
+		"user-agent",
+		"accept",
+		"sec-fetch-site",
+		"sec-fetch-mode",
+		"sec-fetch-user",
+		"sec-fetch-dest",
+		"origin",
+		"referer",
+		"accept-encoding",
+		"accept-language",
+		"cookie",
+	}
 	if options.Headers == nil {
 		options.Headers = make(map[string]string)
 	}

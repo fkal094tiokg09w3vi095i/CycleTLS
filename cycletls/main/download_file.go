@@ -42,5 +42,5 @@ func main() {
 	//	return
 	//}
 	fmt.Println(resp.Status)
-	//fmt.Println(string(body))
+	fmt.Println(string(body))
 }
