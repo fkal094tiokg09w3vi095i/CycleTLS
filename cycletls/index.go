@@ -147,12 +147,12 @@ func dispatcher(res *fullRequest) (response Response, err error) {
 }
 
 // Do creates a single request
-func (client CycleTLS) Do(URL string, options *Options, Method string) (response Response, err error) {
+func (client CycleTLS) Do(URL string, options Options, Method string) (response Response, err error) {
 
 	options.URL = URL
 	options.Method = Method
 
-	response, err = dispatcher(processRequest(options))
+	response, err = dispatcher(processRequest(&options))
 	if err != nil {
 		log.Print("Request Failed: " + err.Error())
 		return response, err
