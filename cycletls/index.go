@@ -63,7 +63,7 @@ type CycleTLS struct {
 }
 
 // ready Request
-func processRequest(options *Options) (result *fullRequest) {
+func processRequest(options Options) (result *fullRequest) {
 	var browser = browser{
 		JA3:           options.Ja3,
 		UserAgent:     options.UserAgent,
@@ -117,7 +117,7 @@ func processRequest(options *Options) (result *fullRequest) {
 		req.Header.Set("Host", u.Host)
 	}
 	req.Header.Set("user-agent", options.UserAgent)
-	return &fullRequest{req: req, client: client, options: *options}
+	return &fullRequest{req: req, client: client, options: options}
 
 }
 
@@ -147,7 +147,7 @@ func dispatcher(res *fullRequest) (response Response, err error) {
 }
 
 // Do creates a single request
-func (client CycleTLS) Do(URL string, options *Options, Method string) (response Response, err error) {
+func (client CycleTLS) Do(URL string, options Options, Method string) (response Response, err error) {
 
 	options.URL = URL
 	options.Method = Method
