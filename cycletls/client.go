@@ -27,9 +27,9 @@ func clientBuilder(browser browser, dialer proxy.ContextDialer, timeout int, dis
 		timeout = 15
 	}
 	client := http.Client{
-		Timeout: time.Duration(timeout) * time.Second,
+		Transport: newRoundTripper(browser, dialer),
+		Timeout:   time.Duration(timeout) * time.Second,
 	}
-	client.Transport = newRoundTripper(browser, dialer)
 	//if disableRedirect is set to true httpclient will not redirect
 	if disableRedirect {
 		client.CheckRedirect = disabledRedirect
