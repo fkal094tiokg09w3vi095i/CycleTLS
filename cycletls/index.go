@@ -71,9 +71,9 @@ func processRequest(options *Options) (result *fullRequest) {
 		HTTP2Settings: options.HTTP2Settings,
 	}
 
-	if options.Ja3 != "" && !strings.HasPrefix(options.URL, "https") {
+	/*if options.Ja3 != "" && !strings.HasPrefix(options.URL, "https") {
 		browser.JA3 = ""
-	}
+	}*/
 
 	client, err := newClient(
 		browser,
