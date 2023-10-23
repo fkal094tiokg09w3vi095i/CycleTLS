@@ -17,9 +17,10 @@ func main() {
 		Headers: map[string]string{
 			"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
 		},
-		//Proxy: "http://127.0.0.1:10809",
+		Proxy: "http://127.0.0.1:10809",
 		//Proxy: "http://127.0.0.1:60010",
-		Proxy: "http://127.0.0.1:8999",
+		//Proxy: "http://127.0.0.1:8999",
+		//Proxy: "http://howard:pppppppp@47.242.250.113:10087",
 	}
 	imitate.Chrome(&options)
 	for s, s2 := range options.Headers {

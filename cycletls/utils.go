@@ -274,7 +274,6 @@ func genMap() (extMap map[string]utls.TLSExtension) {
 			},
 		},
 		"30032": &utls.GenericExtension{Id: 0x7550, Data: []byte{0}}, //FIXME
-		"65037": &utls.GenericExtension{Id: 0xFE0D, Data: []byte{0}}, //FIXME
 		"65281": &utls.RenegotiationInfoExtension{
 			Renegotiation: utls.RenegotiateOnceAsClient,
 		},
