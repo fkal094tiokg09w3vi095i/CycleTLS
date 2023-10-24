@@ -10,8 +10,8 @@ var firefoxH2Settings = &cycletls.H2Settings{
 		"ENABLE_PUSH":            0,
 		"MAX_CONCURRENT_STREAMS": 1000,
 		"INITIAL_WINDOW_SIZE":    131072,
-		"MAX_HEADER_LIST_SIZE":   262144,
 		"MAX_FRAME_SIZE":         16384,
+		"MAX_HEADER_LIST_SIZE":   262144,
 	},
 	SettingsOrder: []string{
 		"HEADER_TABLE_SIZE",
@@ -89,15 +89,48 @@ func Firefox(options *cycletls.Options) {
 		":scheme",
 	}
 
-	options.Headers["Sec-Ch-Ua"] = `"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"`
+	//options.Headers["Sec-Ch-Ua"] = `"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"`
+	options.Headers["upgrade-insecure-requests"] = "1"
 	options.Headers["Sec-Fetch-Dest"] = "document"
 	options.Headers["Sec-Fetch-Mode"] = "navigate"
 	options.Headers["Sec-Fetch-Site"] = "none"
 	options.Headers["Sec-Fetch-User"] = "?1"
 	options.Headers["te"] = "trailers"
-	//options.Headers["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
-	//options.Headers["Accept-Language"] = "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2"
-
+	if options.Headers["Accept"] == "" {
+		options.Headers["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
+	}
+	if options.Headers["Accept-Language"] == "" {
+		options.Headers["Accept-Language"] = "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2"
+	}
+	options.HeaderOrderKeys = []string{
+		"host",
+		"connection",
+		"cache-control",
+		"device-memory",
+		"viewport-width",
+		"rtt",
+		"downlink",
+		"ect",
+		"sec-ch-ua",
+		"sec-ch-ua-mobile",
+		"sec-ch-ua-full-version",
+		"sec-ch-ua-arch",
+		"sec-ch-ua-platform",
+		"sec-ch-ua-platform-version",
+		"sec-ch-ua-model",
+		"user-agent",
+		"accept",
+		"accept-language",
+		"accept-encoding",
+		"upgrade-insecure-requests",
+		"sec-fetch-dest",
+		"sec-fetch-mode",
+		"sec-fetch-site",
+		"sec-fetch-user",
+		"cookie",
+		"referer",
+		"te",
+	}
 	options.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0"
 
 }
