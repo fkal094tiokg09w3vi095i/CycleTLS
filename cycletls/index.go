@@ -42,7 +42,7 @@ type Response struct {
 	Status  int
 	Body    io.ReadCloser
 	Headers map[string]string
-	client  http.Client
+	Client  http.Client
 }
 
 // JSONBody converts response body to json
