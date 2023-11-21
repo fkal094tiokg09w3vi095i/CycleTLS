@@ -42,6 +42,7 @@ type Response struct {
 	Status  int
 	Body    io.ReadCloser
 	Headers map[string]string
+	client  http.Client
 }
 
 // JSONBody converts response body to json
@@ -126,12 +127,13 @@ func dispatcher(res *fullRequest) (response Response, err error) {
 
 	resp, err := res.client.Do(res.req)
 	if err != nil {
-
 		parsedError := parseError(err)
 
 		headers := make(map[string]string)
 		// parsedError.ErrorMsg + "-> \n" + string(err.Error())
-		return Response{parsedError.StatusCode, io.NopCloser(bytes.NewBufferString(parsedError.ErrorMsg)), headers}, err
+		return Response{
+			parsedError.StatusCode, io.NopCloser(bytes.NewBufferString(parsedError.ErrorMsg)), headers, res.client,
+		}, err
 
 	}
 
@@ -144,7 +146,7 @@ func dispatcher(res *fullRequest) (response Response, err error) {
 			headers[name] = values[0]
 		}
 	}
-	return Response{resp.StatusCode, resp.Body, headers}, nil
+	return Response{resp.StatusCode, resp.Body, headers, res.client}, nil
 
 }
 
