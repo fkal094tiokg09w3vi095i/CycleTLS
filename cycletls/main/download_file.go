@@ -24,7 +24,7 @@ func main() {
 		},
 	}
 	imitate.Chrome(&options)
-	resp, err := client.Do(fileURL, &options, "POST")
+	resp, err := client.Do(fileURL, options, "POST")
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
@@ -36,11 +36,11 @@ func main() {
 		fmt.Println("Error:", err)
 		return
 	}
-	//body, err := io.ReadAll(resp.Body)
-	//if err != nil {
-	//	fmt.Println("Error:", err)
-	//	return
-	//}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
 	fmt.Println(resp.Status)
 	fmt.Println(string(body))
 }
