@@ -22,14 +22,8 @@ const (
 
 func parseUserAgent(userAgent string) string {
 	switch {
-	case strings.Contains(strings.ToLower(userAgent), "chrome"):
-		return chrome
 	case strings.Contains(strings.ToLower(userAgent), "firefox"):
 		return firefox
-	case strings.Contains(strings.ToLower(userAgent), "edg"):
-		return chrome
-	case strings.Contains(strings.ToLower(userAgent), "chromium"):
-		return chrome
 	default:
 		return chrome
 	}
