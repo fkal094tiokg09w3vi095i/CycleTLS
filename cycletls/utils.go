@@ -26,7 +26,7 @@ func parseUserAgent(userAgent string) string {
 		return chrome
 	case strings.Contains(strings.ToLower(userAgent), "firefox"):
 		return firefox
-	case strings.Contains(strings.ToLower(userAgent), "edge"):
+	case strings.Contains(strings.ToLower(userAgent), "edg"):
 		return chrome
 	case strings.Contains(strings.ToLower(userAgent), "chromium"):
 		return chrome
