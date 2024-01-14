@@ -26,6 +26,10 @@ func parseUserAgent(userAgent string) string {
 		return chrome
 	case strings.Contains(strings.ToLower(userAgent), "firefox"):
 		return firefox
+	case strings.Contains(strings.ToLower(userAgent), "edge"):
+		return chrome
+	case strings.Contains(strings.ToLower(userAgent), "chromium"):
+		return chrome
 	default:
 		return chrome
 	}
@@ -115,6 +119,26 @@ func StringToSpec(ja3 string, userAgent string) (*utls.ClientHelloSpec, error) {
 	// parse curves
 	var targetCurves []utls.CurveID
 	targetCurves = append(targetCurves, utls.CurveID(utls.GREASE_PLACEHOLDER)) //append grease for Chrome browsers
+	if parsedUserAgent == chrome {
+		targetCurves = append(targetCurves, utls.CurveID(utls.GREASE_PLACEHOLDER)) //append grease for Chrome browsers
+		if supportedVersionsExt, ok := extMap["43"]; ok {
+			if supportedVersions, ok := supportedVersionsExt.(*utls.SupportedVersionsExtension); ok {
+				supportedVersions.Versions = append([]uint16{utls.GREASE_PLACEHOLDER}, supportedVersions.Versions...)
+			}
+		}
+		if keyShareExt, ok := extMap["51"]; ok {
+			if keyShare, ok := keyShareExt.(*utls.KeyShareExtension); ok {
+				keyShare.KeyShares = append([]utls.KeyShare{{Group: utls.CurveID(utls.GREASE_PLACEHOLDER), Data: []byte{0}}}, keyShare.KeyShares...)
+			}
+		}
+	} else {
+		if keyShareExt, ok := extMap["51"]; ok {
+			if keyShare, ok := keyShareExt.(*utls.KeyShareExtension); ok {
+				keyShare.KeyShares = append(keyShare.KeyShares, utls.KeyShare{Group: utls.CurveP256})
+			}
+		}
+	}
+
 	for _, c := range curves {
 		cid, err := strconv.ParseUint(c, 10, 16)
 		if err != nil {
