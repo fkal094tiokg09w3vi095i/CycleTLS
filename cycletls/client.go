@@ -1,8 +1,8 @@
 package cycletls
 
 import (
-	http "github.com/ChengHoward/fhttp"
-	"github.com/ChengHoward/fhttp/http2"
+	http "github.com/Wuhan-Dongce/fhttp"
+	"github.com/Wuhan-Dongce/fhttp/http2"
 
 	"time"
 

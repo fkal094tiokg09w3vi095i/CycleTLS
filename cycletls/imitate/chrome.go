@@ -4,9 +4,7 @@ import (
 	"github.com/ChengHoward/CycleTLS/cycletls"
 )
 
-const chromeExtension = "0-5-10-11-13-16-18-21-23-27-35-43-45-51-17513-65281"
-
-//const chromeExtension = "0-5-10-11-13-16-18-23-27-35-43-45-51-17513-65037-65281" // 65037扩展暂时不支持
+const chromeExtension = "0-5-10-11-13-16-18-21-23-27-35-43-45-51-17513-65037-65281"
 
 var chromeH2Settings = &cycletls.H2Settings{
 	Settings: map[string]int{

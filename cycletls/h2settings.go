@@ -1,7 +1,7 @@
 package cycletls
 
 import (
-	"github.com/ChengHoward/fhttp/http2"
+	"github.com/Wuhan-Dongce/fhttp/http2"
 )
 
 var settings = map[string]http2.SettingID{

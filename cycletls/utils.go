@@ -5,9 +5,9 @@ import (
 	"compress/gzip"
 	"compress/zlib"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"strconv"
 	"strings"
 
@@ -29,36 +29,46 @@ func parseUserAgent(userAgent string) string {
 	default:
 		return chrome
 	}
-
 }
 
 // DecompressBody unzips compressed data
-func DecompressBody(Body io.ReadCloser, encoding string) (parsedBody io.ReadCloser) {
-	BodyBuffer, err := io.ReadAll(Body)
-	if err != nil {
-		return Body
+func DecompressBody(Body []byte, encoding []string, content []string) (parsedBody string) {
+	if len(encoding) > 0 {
+		if encoding[0] == "gzip" {
+			unz, err := gUnzipData(Body)
+			if err != nil {
+				return string(Body)
+			}
+			return string(unz)
+		} else if encoding[0] == "deflate" {
+			unz, err := enflateData(Body)
+			if err != nil {
+				return string(Body)
+			}
+			return string(unz)
+		} else if encoding[0] == "br" {
+			unz, err := unBrotliData(Body)
+			if err != nil {
+				return string(Body)
+			}
+			return string(unz)
+		}
+	} else if len(content) > 0 {
+		decodingTypes := map[string]bool{
+			"image/svg+xml":   true,
+			"image/webp":      true,
+			"image/jpeg":      true,
+			"image/png":       true,
+			"image/gif":       true,
+			"image/avif":      true,
+			"application/pdf": true,
+		}
+		if decodingTypes[content[0]] {
+			return base64.StdEncoding.EncodeToString(Body)
+		}
 	}
-
-	if encoding == "gzip" {
-		unz, err := gUnzipData(BodyBuffer)
-		if err != nil {
-			return io.NopCloser(bytes.NewReader(BodyBuffer))
-		}
-		return io.NopCloser(bytes.NewReader(unz))
-	} else if encoding == "deflate" {
-		unz, err := enflateData(BodyBuffer)
-		if err != nil {
-			return io.NopCloser(bytes.NewReader(BodyBuffer))
-		}
-		return io.NopCloser(bytes.NewReader(unz))
-	} else if encoding == "br" {
-		unz, err := unBrotliData(BodyBuffer)
-		if err != nil {
-			return io.NopCloser(bytes.NewReader(BodyBuffer))
-		}
-		return io.NopCloser(bytes.NewReader(unz))
-	}
-	return io.NopCloser(bytes.NewReader(BodyBuffer))
+	parsedBody = string(Body)
+	return parsedBody
 }
 
 func gUnzipData(data []byte) (resData []byte, err error) {
@@ -67,7 +77,7 @@ func gUnzipData(data []byte) (resData []byte, err error) {
 		return []byte{}, err
 	}
 	defer gz.Close()
-	respBody, err := ioutil.ReadAll(gz)
+	respBody, err := io.ReadAll(gz)
 	return respBody, err
 }
 func enflateData(data []byte) (resData []byte, err error) {
@@ -76,12 +86,12 @@ func enflateData(data []byte) (resData []byte, err error) {
 		return []byte{}, err
 	}
 	defer zr.Close()
-	enflated, err := ioutil.ReadAll(zr)
+	enflated, err := io.ReadAll(zr)
 	return enflated, err
 }
 func unBrotliData(data []byte) (resData []byte, err error) {
 	br := brotli.NewReader(bytes.NewReader(data))
-	respBody, err := ioutil.ReadAll(br)
+	respBody, err := io.ReadAll(br)
 	return respBody, err
 }
 
@@ -221,7 +231,8 @@ func genMap() (extMap map[string]utls.TLSExtension) {
 		"18": &utls.SCTExtension{},
 		"21": &utls.UtlsPaddingExtension{GetPaddingLen: utls.BoringPaddingStyle},
 		"22": &utls.GenericExtension{Id: 22}, // encrypt_then_mac
-		"23": &utls.UtlsExtendedMasterSecretExtension{},
+		"23": &utls.ExtendedMasterSecretExtension{},
+		"24": &utls.FakeTokenBindingExtension{},
 		"27": &utls.UtlsCompressCertExtension{
 			Algorithms: []utls.CertCompressionAlgo{utls.CertCompressionBrotli},
 		},
@@ -237,7 +248,7 @@ func genMap() (extMap map[string]utls.TLSExtension) {
 			},
 		},
 		"35": &utls.SessionTicketExtension{},
-		"41": &utls.FakePreSharedKeyExtension{}, //FIXME pre_shared_key, Currently not supported 41 extension
+		"41": &utls.UtlsPreSharedKeyExtension{}, //FIXME pre_shared_key
 		"43": &utls.SupportedVersionsExtension{Versions: []uint16{
 			utls.VersionTLS13,
 			utls.VersionTLS12,
@@ -257,9 +268,8 @@ func genMap() (extMap map[string]utls.TLSExtension) {
 				utls.PSSWithSHA512,
 				utls.PKCS1WithSHA256,
 				utls.PKCS1WithSHA384,
-				utls.PKCS1WithSHA512,
-				utls.ECDSAWithSHA1,
-				utls.PKCS1WithSHA1,
+				utls.SignatureScheme(0x0806),
+				utls.SignatureScheme(0x0601),
 			},
 		}, // signature_algorithms_cert
 		"51": &utls.KeyShareExtension{KeyShares: []utls.KeyShare{
@@ -267,6 +277,7 @@ func genMap() (extMap map[string]utls.TLSExtension) {
 
 			// {Group: utls.CurveP384}, known bug missing correct extensions for handshake
 		}},
+		"57":    &utls.QUICTransportParametersExtension{},
 		"13172": &utls.NPNExtension{},
 		"17513": &utls.ApplicationSettingsExtension{
 			SupportedProtocols: []string{
@@ -277,6 +288,7 @@ func genMap() (extMap map[string]utls.TLSExtension) {
 		"65281": &utls.RenegotiationInfoExtension{
 			Renegotiation: utls.RenegotiateOnceAsClient,
 		},
+		"65037": utls.BoringGREASEECH(),
 	}
 	return
 

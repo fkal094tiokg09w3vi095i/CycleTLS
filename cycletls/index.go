@@ -3,8 +3,8 @@ package cycletls
 import (
 	"bytes"
 	"encoding/json"
-	http "github.com/ChengHoward/fhttp"
-	"github.com/ChengHoward/fhttp/http2"
+	http "github.com/Wuhan-Dongce/fhttp"
+	"github.com/Wuhan-Dongce/fhttp/http2"
 	"io"
 	"log"
 	"net/url"
