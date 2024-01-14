@@ -7,6 +7,7 @@ require (
 	github.com/andybalholm/brotli v1.0.6
 	github.com/refraction-networking/utls v1.6.0
 	golang.org/x/net v0.19.0
+	h12.io/socks v1.0.3
 )
 
 require github.com/klauspost/compress v1.16.7 // indirect

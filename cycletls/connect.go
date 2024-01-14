@@ -11,12 +11,25 @@ import (
 	http "github.com/Wuhan-Dongce/fhttp"
 	http2 "github.com/Wuhan-Dongce/fhttp/http2"
 	"golang.org/x/net/proxy"
+	"h12.io/socks"
 	"io"
 	"net"
 	"net/url"
 	"strconv"
 	"sync"
 )
+
+type SocksDialer struct {
+	socksDial func(string, string) (net.Conn, error)
+}
+
+func (d *SocksDialer) DialContext(_ context.Context, network, addr string) (net.Conn, error) {
+	return d.socksDial(network, addr)
+}
+
+func (d *SocksDialer) Dial(network, addr string) (net.Conn, error) {
+	return d.socksDial(network, addr)
+}
 
 // connectDialer allows to configure one-time use HTTP CONNECT client
 type connectDialer struct {
@@ -73,7 +86,11 @@ func newConnectDialer(proxyURLStr string, UserAgent string) (proxy.ContextDialer
 				auth = &proxy.Auth{User: username, Password: password}
 			}
 		}
-		dialSocksProxy, err := proxy.SOCKS5("tcp", proxyURL.Host, auth, nil)
+		var forward proxy.Dialer
+		if proxyURL.Scheme == "socks5h" {
+			forward = proxy.Direct
+		}
+		dialSocksProxy, err := proxy.SOCKS5("tcp", proxyURL.Host, auth, forward)
 		if err != nil {
 			return nil, fmt.Errorf("Error creating SOCKS5 proxy, reason %s", err)
 		}
@@ -82,6 +99,12 @@ func newConnectDialer(proxyURLStr string, UserAgent string) (proxy.ContextDialer
 		} else {
 			return nil, errors.New("failed type assertion to DialContext")
 		}
+		client.DefaultHeader.Set("User-Agent", UserAgent)
+		return client, nil
+	case "socks4":
+		var dialer *SocksDialer
+		dialer = &SocksDialer{socks.DialSocksProxy(socks.SOCKS4, proxyURL.Host)}
+		client.Dialer = dialer
 		client.DefaultHeader.Set("User-Agent", UserAgent)
 		return client, nil
 	case "":
