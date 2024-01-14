@@ -77,7 +77,7 @@ func newConnectDialer(proxyURLStr string, UserAgent string) (proxy.ContextDialer
 		if proxyURL.Port() == "" {
 			proxyURL.Host = net.JoinHostPort(proxyURL.Host, "443")
 		}
-	case "socks5":
+	case "socks5", "socks5h":
 		var auth *proxy.Auth
 		if proxyURL.User != nil {
 			if proxyURL.User.Username() != "" {
