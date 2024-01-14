@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/Wuhan-Dongce/fhttp v0.0.0-20240114011107-2393773e5085
 	github.com/andybalholm/brotli v1.0.6
-	github.com/refraction-networking/utls v1.6.0
+	github.com/refraction-networking/utls v1.6.1
 	golang.org/x/net v0.19.0
 	h12.io/socks v1.0.3
 )
