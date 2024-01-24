@@ -180,9 +180,9 @@ func StringToSpec(ja3 string, userAgent string) (*utls.ClientHelloSpec, error) {
 			return nil, raiseExtensionError(e)
 		}
 		// //Optionally add Chrome Grease Extension
-		if e == "21" && parsedUserAgent == chrome {
+		/*if e == "21" && parsedUserAgent == chrome {
 			exts = append(exts, &utls.UtlsGREASEExtension{})
-		}
+		}*/
 		exts = append(exts, te)
 	}
 	//Add this back in if user agent is chrome and no padding extension is given
