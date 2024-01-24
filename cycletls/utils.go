@@ -112,7 +112,6 @@ func StringToSpec(ja3 string, userAgent string) (*utls.ClientHelloSpec, error) {
 	}
 	// parse curves
 	var targetCurves []utls.CurveID
-	targetCurves = append(targetCurves, utls.CurveID(utls.GREASE_PLACEHOLDER)) //append grease for Chrome browsers
 	if parsedUserAgent == chrome {
 		targetCurves = append(targetCurves, utls.CurveID(utls.GREASE_PLACEHOLDER)) //append grease for Chrome browsers
 		if supportedVersionsExt, ok := extMap["43"]; ok {
@@ -180,9 +179,9 @@ func StringToSpec(ja3 string, userAgent string) (*utls.ClientHelloSpec, error) {
 			return nil, raiseExtensionError(e)
 		}
 		// //Optionally add Chrome Grease Extension
-		/*if e == "21" && parsedUserAgent == chrome {
+		if e == "21" && parsedUserAgent == chrome {
 			exts = append(exts, &utls.UtlsGREASEExtension{})
-		}*/
+		}
 		exts = append(exts, te)
 	}
 	//Add this back in if user agent is chrome and no padding extension is given
