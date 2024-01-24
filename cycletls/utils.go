@@ -290,6 +290,7 @@ func genMap() (extMap map[string]utls.TLSExtension) {
 			},
 		}, // signature_algorithms_cert
 		"51": &utls.KeyShareExtension{KeyShares: []utls.KeyShare{
+			{Group: utls.CurveID(utls.GREASE_PLACEHOLDER), Data: []byte{0}},
 			{Group: utls.X25519},
 
 			// {Group: utls.CurveP384}, known bug missing correct extensions for handshake
