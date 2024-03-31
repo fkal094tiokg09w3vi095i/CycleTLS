@@ -22,7 +22,6 @@ func main() {
 			"Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,sq;q=0.7",
 			"Referer":         "https://link.2505.top/article/10.1007/s10029-020-02328-x",
 			"User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.5735.134 Electron/25.2.0 Safari/537.36",
-			"Host":            "www.vijesti.me",
 		},
 		Proxy:   "socks5://127.0.0.1:10808",
 		Cookies: []cycletls.Cookie{},
@@ -36,7 +35,7 @@ func main() {
 
 	//options.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.5735.134 Electron/25.2.0 Safari/537.36"
 
-	resp, err := client.Do("https://92.249.52.175", options, "GET")
+	resp, err := client.Do("https://tls.peet.ws/api/all", options, "GET")
 	if err != nil {
 		log.Print("Request Failed: " + err.Error())
 		return
