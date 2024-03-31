@@ -3,7 +3,7 @@ module github.com/ChengHoward/CycleTLS/cycletls
 go 1.17
 
 require (
-	github.com/Wuhan-Dongce/fhttp 03c0052e826ccd21886327521f8a02098633d1e9
+	github.com/Wuhan-Dongce/fhttp v0.0.0-20240331163936-c8b1872d0695
 	github.com/andybalholm/brotli v1.0.6
 	github.com/refraction-networking/utls v1.6.1
 	golang.org/x/net v0.19.0
