@@ -28,10 +28,10 @@ func main() {
 	//imitate.Chrome(&options)
 	//imitate.Firefox(&options)
 	//imitate.Chromium(&options)
-	//imitate.Edge(&options)
-	imitate.Safari(&options)
+	imitate.Edge(&options)
+	//imitate.Safari(&options)
 
-	resp, err := client.Do("https://tls.peet.ws/api/all", &options, "GET")
+	resp, err := client.Do("https://tls.peet.ws/api/all", options, "GET")
 	//resp, err := client.Do("https://tls.browserleaks.com/json", options, "GET")
 	if err != nil {
 		log.Print("Request Failed: " + err.Error())
