@@ -308,7 +308,7 @@ func genMap() (extMap map[string]utls.TLSExtension) {
 		"65281": &utls.RenegotiationInfoExtension{
 			Renegotiation: utls.RenegotiateOnceAsClient,
 		},
-		"65037": utls.BoringGREASEECH(),
+		"65037": &utls.GREASEEncryptedClientHelloExtension{},
 	}
 	return
 
