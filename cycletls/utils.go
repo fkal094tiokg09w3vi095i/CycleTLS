@@ -7,6 +7,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"io"
 	"strconv"
 	"strings"
@@ -156,48 +157,33 @@ func StringToSpec(ja3 string, userAgent string) (*utls.ClientHelloSpec, error) {
 	extMap["11"] = &utls.SupportedPointsExtension{SupportedPoints: targetPointFormats}
 
 	// set extension 43
-	vid64, err := strconv.ParseUint(version, 10, 16)
+	ver, err := strconv.ParseUint(version, 10, 16)
 	if err != nil {
 		return nil, err
 	}
-	vid := uint16(vid64)
-	// extMap["43"] = &utls.SupportedVersionsExtension{
-	// 	Versions: []uint16{
-	// 		utls.VersionTLS12,
-	// 	},
-	// }
+	tlsMaxVersion, tlsMinVersion, tlsExtension, err := createTlsVersion(uint16(ver))
+	extMap["43"] = tlsExtension
 
 	// build extenions list
 	var exts []utls.TLSExtension
 	//Optionally Add Chrome Grease Extension
-	if parsedUserAgent == chrome {
-		exts = append(exts, &utls.UtlsGREASEExtension{})
-	}
 	for _, e := range extensions {
 		te, ok := extMap[e]
 		if !ok {
 			return nil, raiseExtensionError(e)
 		}
 		// //Optionally add Chrome Grease Extension
+		// if e == "21" && parsedUserAgent == chrome && !tlsExtensions.UseGREASE {
 		if e == "21" && parsedUserAgent == chrome {
 			exts = append(exts, &utls.UtlsGREASEExtension{})
 		}
 		exts = append(exts, te)
 	}
-	//Add this back in if user agent is chrome and no padding extension is given
-	// if parsedUserAgent == chrome {
-	// 	exts = append(exts, &utls.UtlsGREASEExtension{})
-	// 	exts = append(exts, &utls.UtlsPaddingExtension{GetPaddingLen: utls.BoringPaddingStyle})
-	// }
-	// build SSLVersion
-	// vid64, err := strconv.ParseUint(version, 10, 16)
-	// if err != nil {
-	// 	return nil, err
-	// }
 
 	// build CipherSuites
 	var suites []uint16
 	//Optionally Add Chrome Grease Extension
+	// if parsedUserAgent == chrome && !tlsExtensions.UseGREASE {
 	if parsedUserAgent == chrome {
 		suites = append(suites, utls.GREASE_PLACEHOLDER)
 	}
@@ -208,15 +194,53 @@ func StringToSpec(ja3 string, userAgent string) (*utls.ClientHelloSpec, error) {
 		}
 		suites = append(suites, uint16(cid))
 	}
-	_ = vid
 	return &utls.ClientHelloSpec{
-		// TLSVersMin:         vid,
-		// TLSVersMax:         vid,
+		TLSVersMin:         tlsMinVersion,
+		TLSVersMax:         tlsMaxVersion,
 		CipherSuites:       suites,
 		CompressionMethods: []byte{0},
 		Extensions:         exts,
 		GetSessionID:       sha256.Sum256,
 	}, nil
+}
+
+// TLSVersion，Ciphers，Extensions，EllipticCurves，EllipticCurvePointFormats
+func createTlsVersion(ver uint16) (tlsMaxVersion uint16, tlsMinVersion uint16, tlsSuppor utls.TLSExtension, err error) {
+	switch ver {
+	case utls.VersionTLS13:
+		tlsMaxVersion = utls.VersionTLS13
+		tlsMinVersion = utls.VersionTLS12
+		tlsSuppor = &utls.SupportedVersionsExtension{
+			Versions: []uint16{
+				utls.GREASE_PLACEHOLDER,
+				utls.VersionTLS13,
+				utls.VersionTLS12,
+			},
+		}
+	case utls.VersionTLS12:
+		tlsMaxVersion = utls.VersionTLS12
+		tlsMinVersion = utls.VersionTLS11
+		tlsSuppor = &utls.SupportedVersionsExtension{
+			Versions: []uint16{
+				utls.GREASE_PLACEHOLDER,
+				utls.VersionTLS12,
+				utls.VersionTLS11,
+			},
+		}
+	case utls.VersionTLS11:
+		tlsMaxVersion = utls.VersionTLS11
+		tlsMinVersion = utls.VersionTLS10
+		tlsSuppor = &utls.SupportedVersionsExtension{
+			Versions: []uint16{
+				utls.GREASE_PLACEHOLDER,
+				utls.VersionTLS11,
+				utls.VersionTLS10,
+			},
+		}
+	default:
+		err = errors.New("ja3Str tls version error")
+	}
+	return
 }
 
 func genMap() (extMap map[string]utls.TLSExtension) {
