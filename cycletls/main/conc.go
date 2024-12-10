@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/ChengHoward/CycleTLS/cycletls"
+	"github.com/fkal094tiokg09w3vi095i/CycleTLS/cycletls"
 	"io"
 	"sync"
 	"time"
