@@ -1,4 +1,4 @@
-module github.com/fkal094tiokg09w3vi095i/CycleTLS/cycletls
+module github.com/fkal094tiokg09w3vi095i/spoof2/cycletls
 
 go 1.17
 
