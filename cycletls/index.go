@@ -158,7 +158,6 @@ func (client CycleTLS) Do(URL string, options Options, Method string) (response 
 
 	response, err = dispatcher(processRequest(&options))
 	if err != nil {
-		log.Print("Request Failed: " + err.Error())
 		return response, err
 	}
 
